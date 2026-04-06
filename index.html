@@ -1,66 +1,249 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>每日全网热点</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>每日全网热点热榜</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:PingFang SC,Microsoft YaHei,sans-serif;background:#f7f8fa;padding:20px}
-.title{text-align:center;font-size:22px;margin-bottom:20px;color:#222}
-.tabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
-.tab{padding:8px 14px;border-radius:20px;background:#fff;border:1px solid #eee;cursor:pointer}
-.tab.active{background:#1677ff;color:#fff}
-.hot-list{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.item{padding:12px 0;border-bottom:1px solid #f2f2f2;display:flex;align-items:center}
-.item:last-child{border-bottom:none}
-.num{width:24px;height:24px;line-height:24px;text-align:center;border-radius:4px;background:#f2f2f2;margin-right:10px;font-weight:bold}
-.num.top1{background:#ff4d4f;color:#fff}
-.num.top2{background:#ff7d00;color:#fff}
-.num.top3{background:#14c9c9;color:#fff}
-.title-text{flex:1;font-size:15px;color:#333}
-.hot{font-size:12px;color:#999;margin-left:8px}
-a{text-decoration:none;color:inherit;display:block}
-.platform{text-align:center;margin-top:12px;font-size:14px;color:#666}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f2f4f6;
+    padding: 20px;
+  }
+  .page-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 6px;
+    color: #222;
+  }
+  .tip {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  .hot-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hot-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+  }
+  .hot-item:last-child {
+    border-bottom: none;
+  }
+  .num {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #f5f5f5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .num.top1 { background: #ff3636; color: #fff; }
+  .num.top2 { background: #ff7d00; color: #fff; }
+  .num.top3 { background: #00c8c8; color: #fff; }
+  .text {
+    flex: 1;
+    font-size: 15px;
+    color: #222;
+    line-height: 1.4;
+  }
+  .hot {
+    font-size: 12px;
+    color: #999;
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .loading {
+    padding: 20px 0;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #999;
+  }
 </style>
 </head>
+
 <body>
-<div class="title">📛 每日全网热点聚合</div>
-<div class="tabs">
-<div class="tab active" data-platform="weibo">微博</div>
-<div class="tab" data-platform="douyin">抖音</div>
-<div class="tab" data-platform="bilibili">B站</div>
-<div class="tab" data-platform="xiaohongshu">小红书</div>
-</div>
-<div class="hot-list" id="hotList">加载中...</div>
-<div class="platform">数据来源：公开热榜 · 每小时自动更新</div>
+  <h1 class="page-title">📛 全网实时热点</h1>
+  <div class="tip">微博 | 抖音 | B站 | 小红书 · 每10分钟自动更新</div>
+
+  <div class="hot-wrapper">
+    <!-- 微博 -->
+    <div class="card">
+      <div class="card-title">🔴 微博热搜</div>
+      <div id="weibo" class="list">加载中...</div>
+    </div>
+
+    <!-- 抖音 -->
+    <div class="card">
+      <div class="card-title">🟢 抖音热榜</div>
+      <div id="douyin" class="list">加载中...</div>
+    </div>
+
+    <!-- B站 -->
+    <div class="card">
+      <div class="card-title">🔵 B站热门</div>
+      <div id="bilibili" class="list">加载中...</div>
+    </div>
+
+    <!-- 小红书 -->
+    <div class="card">
+      <div class="card-title">🟡 小红书热门</div>
+      <div id="xiaohongshu" class="list">加载中...</div>
+    </div>
+  </div>
+
+  <div class="footer">热点来源：平台公开榜单 · 自动刷新</div>
 
 <script>
-const tabs = document.querySelectorAll('.tab');
-const hotList = document.getElementById('hotList');
+  // 每10分钟刷新一次
+  const REFRESH_MIN = 10
+  const REFRESH_TIME = REFRESH_MIN * 60 * 1000
 
-// 跳转官方热榜（最稳定、不封号、不用API）
-const links = {
-weibo: "https://s.weibo.com/top/summary",
-douyin: "https://www.douyin.com/hot",
-bilibili: "https://www.bilibili.com/ranking",
-xiaohongshu: "https://www.xiaohongshu.com/hot"
-};
+  // 工具：JSONP（解决跨域，保证GitHub可用）
+  function jsonp(url) {
+    return new Promise((resolve) => {
+      const cb = "jsonp_" + Date.now()
+      window[cb] = (data) => {
+        delete window[cb]
+        resolve(data)
+      }
+      const s = document.createElement("script")
+      s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb
+      document.body.appendChild(s)
+      setTimeout(() => document.body.removeChild(s), 3000)
+    })
+  }
 
-// 切换平台
-tabs.forEach(tab => {
-tab.addEventListener('click', () => {
-tabs.forEach(t => t.classList.remove('active'));
-tab.classList.add('active');
-const p = tab.dataset.platform;
-hotList.innerHTML = `<a href="${links[p]}" target="_blank" style="padding:20px;text-align:center;color:#1677ff">
-点击查看【${tab.innerText}】实时热点榜</a>`;
-});
-});
+  // 渲染一条
+  function renderItem(i, title, hot, link) {
+    let cls = ""
+    if (i === 0) cls = "top1"
+    else if (i === 1) cls = "top2"
+    else if (i === 2) cls = "top3"
 
-// 默认加载微博
-hotList.innerHTML = `<a href="${links.weibo}" target="_blank" style="padding:20px;text-align:center;color:#1677ff">
-点击查看【微博】实时热点榜</a>`;
+    return `
+      <a href="${link}" target="_blank">
+        <div class="hot-item">
+          <span class="num ${cls}">${i + 1}</span>
+          <div class="text">${title}</div>
+          <div class="hot">${hot || ""}</div>
+        </div>
+      </a>
+    `
+  }
+
+  // 微博
+  async function loadWeibo() {
+    const dom = document.getElementById("weibo")
+    try {
+      const res = await jsonp("https://www.coderutil.com/api/resou/v1/weibo.jsonp")
+      const list = (res.data || []).slice(0, 15)
+      dom.innerHTML = list.map((item, i) =>
+        renderItem(i, item.word, item.hot + " 热度", item.url)
+      ).join("")
+    } catch (e) {
+      dom.innerHTML = "<div class='loading'>加载失败</div>"
+    }
+  }
+
+  // 抖音
+  async function loadDouyin() {
+    const dom = document.getElementById("douyin")
+    try {
+      const res = await fetch("https://www.douyin.com/aweme/v1/web/hot/search/list/")
+      const json = await res.json()
+      const list = (json.data?.word_list || []).slice(0, 15)
+      dom.innerHTML = list.map((item, i) =>
+        renderItem(i, item.word, item.hot_value + " 热度", "#")
+      ).join("")
+    } catch (e) {
+      dom.innerHTML = "<div class='loading'>加载失败</div>"
+    }
+  }
+
+  // B站
+  async function loadBilibili() {
+    const dom = document.getElementById("bilibili")
+    try {
+      const res = await fetch("https://api.bilibili.com/x/web-interface/popular")
+      const json = await res.json()
+      const list = (json.data?.list || []).slice(0, 15)
+      dom.innerHTML = list.map((item, i) => {
+        const link = "https://www.bilibili.com/video/" + item.bvid
+        return renderItem(i, item.title, item.stat?.view + " 观看", link)
+      }).join("")
+    } catch (e) {
+      dom.innerHTML = "<div class='loading'>加载失败</div>"
+    }
+  }
+
+  // 小红书（官方跳转，最稳定）
+  function loadXiaohongshu() {
+    const dom = document.getElementById("xiaohongshu")
+    dom.innerHTML = `
+      <a href="https://www.xiaohongshu.com/hot" target="_blank">
+        <div class="hot-item">
+          <span class="num top1">1</span>
+          <div class="text">点击进入小红书官方热榜</div>
+        </div>
+      </a>
+    `
+  }
+
+  // 一次加载全部
+  async function loadAll() {
+    console.log("↻ 每" + REFRESH_MIN + "分钟自动刷新一次")
+    loadWeibo()
+    loadDouyin()
+    loadBilibili()
+    loadXiaohongshu()
+  }
+
+  // 首次 + 定时刷新
+  loadAll()
+  setInterval(loadAll, REFRESH_TIME)
 </script>
 </body>
 </html>
