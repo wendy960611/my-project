@@ -1,0 +1,4 @@
+# 无关文件，不会影响你的项目
+.DS_Store
+*.log
+node_modules/
