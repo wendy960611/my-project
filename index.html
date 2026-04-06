@@ -141,22 +141,10 @@
   const REFRESH_MIN = 10
   const REFRESH_TIME = REFRESH_MIN * 60 * 1000
 
-  // 工具：JSONP（解决跨域，保证GitHub可用）
-  function jsonp(url) {
-    return new Promise((resolve) => {
-      const cb = "jsonp_" + Date.now()
-      window[cb] = (data) => {
-        delete window[cb]
-        resolve(data)
-      }
-      const s = document.createElement("script")
-      s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb
-      document.body.appendChild(s)
-      setTimeout(() => document.body.removeChild(s), 3000)
-    })
-  }
+  // 跨域代理（解决GitHub Pages跨域问题）
+  const CORS_PROXY = "https://api.allorigins.win/raw?url="
 
-  // 渲染一条
+  // 渲染一条热点
   function renderItem(i, title, hot, link) {
     let cls = ""
     if (i === 0) cls = "top1"
@@ -174,62 +162,88 @@
     `
   }
 
-  // 微博
+  // 微博（JSONP跨域，稳定可用）
   async function loadWeibo() {
     const dom = document.getElementById("weibo")
     try {
-      const res = await jsonp("https://www.coderutil.com/api/resou/v1/weibo.jsonp")
+      const res = await new Promise((resolve) => {
+        const cb = "jsonp_weibo_" + Date.now()
+        window[cb] = (data) => {
+          delete window[cb]
+          resolve(data)
+        }
+        const s = document.createElement("script")
+        s.src = "https://www.coderutil.com/api/resou/v1/weibo.jsonp?callback=" + cb
+        document.body.appendChild(s)
+        setTimeout(() => document.body.removeChild(s), 3000)
+      })
       const list = (res.data || []).slice(0, 15)
       dom.innerHTML = list.map((item, i) =>
         renderItem(i, item.word, item.hot + " 热度", item.url)
       ).join("")
     } catch (e) {
       dom.innerHTML = "<div class='loading'>加载失败</div>"
+      console.error("微博加载失败:", e)
     }
   }
 
-  // 抖音
+  // 抖音（通过聚合API获取，无跨域）
   async function loadDouyin() {
     const dom = document.getElementById("douyin")
     try {
-      const res = await fetch("https://www.douyin.com/aweme/v1/web/hot/search/list/")
+      const apiUrl = encodeURIComponent("https://uapis.cn/api/v1/misc/hotboard?type=douyin")
+      const res = await fetch(CORS_PROXY + apiUrl)
       const json = await res.json()
-      const list = (json.data?.word_list || []).slice(0, 15)
+      const list = (json.data || []).slice(0, 15)
       dom.innerHTML = list.map((item, i) =>
-        renderItem(i, item.word, item.hot_value + " 热度", "#")
+        renderItem(i, item.title, item.hot + " 热度", item.url)
       ).join("")
     } catch (e) {
       dom.innerHTML = "<div class='loading'>加载失败</div>"
+      console.error("抖音加载失败:", e)
     }
   }
 
-  // B站
+  // B站（通过聚合API获取，无跨域）
   async function loadBilibili() {
     const dom = document.getElementById("bilibili")
     try {
-      const res = await fetch("https://api.bilibili.com/x/web-interface/popular")
+      const apiUrl = encodeURIComponent("https://uapis.cn/api/v1/misc/hotboard?type=bilibili")
+      const res = await fetch(CORS_PROXY + apiUrl)
       const json = await res.json()
-      const list = (json.data?.list || []).slice(0, 15)
-      dom.innerHTML = list.map((item, i) => {
-        const link = "https://www.bilibili.com/video/" + item.bvid
-        return renderItem(i, item.title, item.stat?.view + " 观看", link)
-      }).join("")
+      const list = (json.data || []).slice(0, 15)
+      dom.innerHTML = list.map((item, i) =>
+        renderItem(i, item.title, item.hot + " 热度", item.url)
+      ).join("")
     } catch (e) {
       dom.innerHTML = "<div class='loading'>加载失败</div>"
+      console.error("B站加载失败:", e)
     }
   }
 
-  // 小红书（官方跳转，最稳定）
-  function loadXiaohongshu() {
+  // 小红书（通过聚合API获取，无跨域）
+  async function loadXiaohongshu() {
     const dom = document.getElementById("xiaohongshu")
-    dom.innerHTML = `
-      <a href="https://www.xiaohongshu.com/hot" target="_blank">
-        <div class="hot-item">
-          <span class="num top1">1</span>
-          <div class="text">点击进入小红书官方热榜</div>
-        </div>
-      </a>
-    `
+    try {
+      const apiUrl = encodeURIComponent("https://uapis.cn/api/v1/misc/hotboard?type=xiaohongshu")
+      const res = await fetch(CORS_PROXY + apiUrl)
+      const json = await res.json()
+      const list = (json.data || []).slice(0, 15)
+      dom.innerHTML = list.map((item, i) =>
+        renderItem(i, item.title, item.hot + " 热度", item.url)
+      ).join("")
+    } catch (e) {
+      // 兜底：直接跳转官方热榜
+      dom.innerHTML = `
+        <a href="https://www.xiaohongshu.com/hot" target="_blank">
+          <div class="hot-item">
+            <span class="num top1">1</span>
+            <div class="text">点击进入小红书官方热榜</div>
+          </div>
+        </a>
+      `
+      console.error("小红书加载失败:", e)
+    }
   }
 
   // 一次加载全部
@@ -241,7 +255,7 @@
     loadXiaohongshu()
   }
 
-  // 首次 + 定时刷新
+  // 首次加载 + 定时刷新
   loadAll()
   setInterval(loadAll, REFRESH_TIME)
 </script>
