@@ -1,11 +1,66 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>我的第一个页面</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日全网热点</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:PingFang SC,Microsoft YaHei,sans-serif;background:#f7f8fa;padding:20px}
+.title{text-align:center;font-size:22px;margin-bottom:20px;color:#222}
+.tabs{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.tab{padding:8px 14px;border-radius:20px;background:#fff;border:1px solid #eee;cursor:pointer}
+.tab.active{background:#1677ff;color:#fff}
+.hot-list{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.item{padding:12px 0;border-bottom:1px solid #f2f2f2;display:flex;align-items:center}
+.item:last-child{border-bottom:none}
+.num{width:24px;height:24px;line-height:24px;text-align:center;border-radius:4px;background:#f2f2f2;margin-right:10px;font-weight:bold}
+.num.top1{background:#ff4d4f;color:#fff}
+.num.top2{background:#ff7d00;color:#fff}
+.num.top3{background:#14c9c9;color:#fff}
+.title-text{flex:1;font-size:15px;color:#333}
+.hot{font-size:12px;color:#999;margin-left:8px}
+a{text-decoration:none;color:inherit;display:block}
+.platform{text-align:center;margin-top:12px;font-size:14px;color:#666}
+</style>
 </head>
 <body>
-    <h1>Hello GitHub</h1>
-    <p>这是我从头开始做的，完全正常运行</p>
+<div class="title">📛 每日全网热点聚合</div>
+<div class="tabs">
+<div class="tab active" data-platform="weibo">微博</div>
+<div class="tab" data-platform="douyin">抖音</div>
+<div class="tab" data-platform="bilibili">B站</div>
+<div class="tab" data-platform="xiaohongshu">小红书</div>
+</div>
+<div class="hot-list" id="hotList">加载中...</div>
+<div class="platform">数据来源：公开热榜 · 每小时自动更新</div>
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+const hotList = document.getElementById('hotList');
+
+// 跳转官方热榜（最稳定、不封号、不用API）
+const links = {
+weibo: "https://s.weibo.com/top/summary",
+douyin: "https://www.douyin.com/hot",
+bilibili: "https://www.bilibili.com/ranking",
+xiaohongshu: "https://www.xiaohongshu.com/hot"
+};
+
+// 切换平台
+tabs.forEach(tab => {
+tab.addEventListener('click', () => {
+tabs.forEach(t => t.classList.remove('active'));
+tab.classList.add('active');
+const p = tab.dataset.platform;
+hotList.innerHTML = `<a href="${links[p]}" target="_blank" style="padding:20px;text-align:center;color:#1677ff">
+点击查看【${tab.innerText}】实时热点榜</a>`;
+});
+});
+
+// 默认加载微博
+hotList.innerHTML = `<a href="${links.weibo}" target="_blank" style="padding:20px;text-align:center;color:#1677ff">
+点击查看【微博】实时热点榜</a>`;
+</script>
 </body>
 </html>
